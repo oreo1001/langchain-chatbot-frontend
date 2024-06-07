@@ -2,13 +2,21 @@
 import { RootState } from '../store'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 
 type ChatState = {
   question: string
   aiResponse: string
+  messageList: string[]
 }
 
+// interface AIMessage {
+//   speaker: string,
+//   content: string
+// }
+
 const initialState: ChatState = {
+  messageList: [],
   question: '',
   aiResponse: ''
 }
@@ -20,6 +28,9 @@ export const chatSlice = createSlice({
     reset: () => initialState,
     getResponse: (state, action: PayloadAction<string>) => {
       state.aiResponse = action.payload
+    },
+    addMessageToList: (state, action: PayloadAction<string>) => {
+      state.messageList.push(action.payload)
     }
   },
 })
@@ -27,6 +38,14 @@ export const chatSlice = createSlice({
 export const {
   getResponse,
   reset,
+  addMessageToList,
 } = chatSlice.actions
-export const selectResponse = (state: RootState) => state.chat.aiResponse
-export default chatSlice.reducer
+const persistConfig = {
+  key: 'chat',
+  storage,
+}
+export const getChatState = (state: RootState) => state.chat
+export const getMessageList = (state: RootState) => state.chat.messageList
+const persistedChatReducer = persistReducer(persistConfig, chatSlice.reducer)
+
+export default persistedChatReducer

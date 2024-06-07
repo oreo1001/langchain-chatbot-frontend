@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import chatReducer from './slices/chatSlice'
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage'
+import persistedChatReducer from './slices/chatSlice'
 
 export const store = configureStore({
     reducer: {
-        chat: chatReducer,
+        chat: persistedChatReducer,
     },
     //   devTools: process.env.NODE_ENV !== "production",
 })

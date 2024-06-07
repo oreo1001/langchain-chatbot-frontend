@@ -2,6 +2,7 @@ import Image from "next/image";
 import ChatList from "./chatList";
 import { TiLocationArrow } from "react-icons/ti";
 import React, { useState } from 'react';
+import InputBox from "./inputBox";
 
 export default function Home() {
   return (
@@ -19,15 +20,7 @@ export default function Home() {
           </div>
           <ChatList></ChatList>
         </div>
-        <div className="flex w-full bg-gray-200 rounded-lg px-3 py-2 mb-10 border-2 border-gray-200 focus-within:border-2 focus-within:border-red-500 group">
-          <input
-            placeholder="Your message"
-            type="text"
-            className="w-full focus:outline-none bg-transparent text-slate-600"
-          />
-          <div className="flex-grow"></div>
-          <div className="flex justify-end"><TiLocationArrow className="w-7 h-7"></TiLocationArrow></div>
-        </div>
+        <InputBox></InputBox>
       </div>
     </div>
   );

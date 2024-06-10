@@ -11,8 +11,8 @@ export default function ChatNav() {
     };
 
     return (
-        <div className="flex flex-row justify-end w-full" onClick={handleReset}>
-            <AiOutlineClear height={5}></AiOutlineClear>
+        <div className="flex flex-row justify-end w-full">
+            <AiOutlineClear height={5} onClick={handleReset}></AiOutlineClear>
         </div>
     );
 }

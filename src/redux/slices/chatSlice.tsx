@@ -5,20 +5,16 @@ import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
 type ChatState = {
-  question: string
-  aiResponse: string
-  messageList: string[]
+  messageList: ChatMessage[]
 }
 
-// interface AIMessage {
-//   speaker: string,
-//   content: string
-// }
+interface ChatMessage {
+  speaker: 'human' | 'ai'
+  content: string
+}
 
 const initialState: ChatState = {
   messageList: [],
-  question: '',
-  aiResponse: ''
 }
 
 export const chatSlice = createSlice({
@@ -26,19 +22,15 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
-    getResponse: (state, action: PayloadAction<string>) => {
-      state.aiResponse = action.payload
-    },
-    addMessageToList: (state, action: PayloadAction<string>) => {
+    addMessageToList: (state, action: PayloadAction<ChatMessage>) => {
       state.messageList.push(action.payload)
-    }
+    },
   },
 })
 
 export const {
-  getResponse,
   reset,
-  addMessageToList,
+  addMessageToList
 } = chatSlice.actions
 const persistConfig = {
   key: 'chat',

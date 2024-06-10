@@ -1,7 +1,6 @@
 import Image from "next/image";
 import ChatList from "./component/chatList";
-import { TiLocationArrow } from "react-icons/ti";
-import React, { useState } from 'react';
+import React from 'react';
 import InputBox from "./component/inputBox";
 import ChatNav from "./component/chatNav";
 

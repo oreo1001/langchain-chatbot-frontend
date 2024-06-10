@@ -2,7 +2,7 @@
 
 import { useAppSelector } from "@/redux/hooks";
 import { getMessageList } from "@/redux/slices/chatSlice";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HumanBox, AIBox } from "./chatBox"
 
 interface ChatMessage {
@@ -12,6 +12,16 @@ interface ChatMessage {
 
 export default function ChatList() {
     const messageList = useAppSelector(getMessageList);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+    useEffect(() => {
+        scrollToBottom();
+    }, [messageList]);
 
     return (
         <div>
@@ -22,6 +32,7 @@ export default function ChatList() {
                     <AIBox key={index} content={message.content} speaker={"ai"} />
                 )
             ))}
+            <div ref={messagesEndRef} />
         </div>
     );
 }

@@ -1,40 +1,57 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { Board } from '../../types';
-import { useParams } from 'next/navigation';
+import { getBoardList } from '@/redux/slices/boardSlice';
+import { useAppSelector } from '@/redux/hooks';
+import { useParams, useRouter } from 'next/navigation';
+import { AIResponse } from './AIResponse';
 
-const BoardPage = () => {
+export default function BoardPage() {
     const params = useParams();
     const id = params.id;
     const [board, setBoard] = useState<Board | null>(null);
+    const router = useRouter()
+    const boardList = useAppSelector(getBoardList);
 
     useEffect(() => {
-        // 게시글 목록을 로컬 스토리지나 서버에서 불러오는 로직을 구현할 수 있습니다.
-        // 여기서는 간단히 예제 데이터를 사용합니다.
+        //persist 스토리지로 구현
         const fetchBoard = async () => {
-            // 예제 데이터
-            const boardList: Board[] = [
-                { id: 1, title: '첫 번째 게시글', content: '첫 번째 내용입니다.' },
-                { id: 2, title: '두 번째 게시글', content: '두 번째 내용입니다.' },
-            ];
             const foundBoard = boardList.find((b) => b.id === Number(id));
             setBoard(foundBoard || null);
         };
         if (id) {
             fetchBoard();
         }
-    }, [id]);
+    }, [id, boardList]);
 
     if (!board) {
-        return <div>게시글을 찾을 수 없습니다.</div>;
+        return <div className='flex items-center justify-center w-screen h-screen bg-white'>게시글을 찾을 수 없습니다.</div>;
     }
 
     return (
-        <div>
-            <h1>{board.title}</h1>
-            <p>{board.content}</p>
-        </div>
+        <>
+            <div className='flex justify-center bg-white w-screen h-screen'>
+                <div className='flex flex-col items-center'>
+                    <div className='flex items-start justify-start w-full text-4xl mt-[50px]'>
+                        Q&A
+                    </div>
+                    <div className='mt-6 border-t-2 w-[600px]'></div>
+                    <div className='flex flex-row w-full my-5 px-3 h-[30px]'>
+                        {board.title === '' ? '제목없음' : board.title}
+                    </div>
+                    <div className='flex w-full border-t-[1px] border-slate-200 py-3'></div>
+                    <div className='flex w-full items-start overflow-y-auto h-[480px]'>
+                        <div
+                            className="flex px-3 py-2 text-gray-700 resize-none outline-none"
+                        >{board.content === '' ? '제목없음' : board.content}</div>
+                    </div>
+
+                    <div className='flex w-full justify-start'>
+                        <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={() => router.push('/board')}>목록</button>
+                    </div>
+                </div>
+            </div>
+            <AIResponse content={board.content} title={board.title} />
+        </>
     );
 };
-
-export default BoardPage;

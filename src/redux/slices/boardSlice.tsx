@@ -1,4 +1,5 @@
 'use client'
+import { Board } from '@/app/types'
 import { RootState } from '../store'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
@@ -6,11 +7,6 @@ import storage from 'redux-persist/lib/storage'
 
 type BoardState = {
     boardList: Board[]
-}
-
-interface Board {
-    title: string
-    content: string
 }
 
 const initialState: BoardState = {

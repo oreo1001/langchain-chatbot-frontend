@@ -24,22 +24,25 @@ export default function InputBox() {
         setInputValue(''); // 메시지 전송 후 입력 필드 초기화
         setLoading(true); // 로딩 상태로 설정
 
-        // const controller = new AbortController();
-        // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃 설정
-
-        let response = await axios.post(process.env.NEXT_PUBLIC_THIS_APP_URL + '/api/chat',
-            {
-                question: inputValue
-            },
-            {
-                withCredentials: true,
-            }
-        )
-        const chatMessages = response.data.messages;
-        console.log(response)
-        dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
-
-        setLoading(false)
+        try {
+            const response = await fetch(process.env.NEXT_PUBLIC_THIS_APP_URL + '/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify({ question: inputValue }),
+            });
+            const test = await response;
+            console.log(test)
+            const responseJson = await response.json();
+            console.log(responseJson);
+            const chatMessages = responseJson.data.messages;
+            dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setLoading(false); // 로딩 상태 해제
+        }
     };
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {

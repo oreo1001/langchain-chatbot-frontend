@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+
 
 interface ChatBoxProps {
     speaker: 'human' | 'ai';
     content: string;
 }
+
+const renderContentWithImages = (content: string) => {
+    const regex = /https:\/\/[^ ]+\.(?:png|jpg|jpeg|gif)/g;
+    const parts = content.split(regex);
+    const matches = content.match(regex);
+
+    if (!matches) {
+        return <p>{content}</p>;
+    }
+
+    return (
+        <div>
+            {parts.map((part, index) => (
+                <React.Fragment key={index}>
+                    <span>{part}</span>
+                    {matches[index] && <img src={matches[index]} alt={`Image ${index}`} className="my-4" />}
+                </React.Fragment>
+            ))}
+        </div>
+    );
+};
 
 export function AIBox({ content }: ChatBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-7 whitespace-pre-line';
@@ -15,7 +37,7 @@ export function AIBox({ content }: ChatBoxProps) {
                 <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
             </div>
             <div className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
-                {content}
+                {renderContentWithImages(content)}
             </div>
         </div>
     );

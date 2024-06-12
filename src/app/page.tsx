@@ -3,6 +3,7 @@ import ChatList from "./component/chatList";
 import React from 'react';
 import InputBox from "./component/inputBox";
 import ChatNav from "./component/chatNav";
+import InputTest from "./component/inputTest";
 
 export default function Home() {
   return (
@@ -28,6 +29,7 @@ export default function Home() {
           <ChatList></ChatList>
         </div>
         <InputBox></InputBox>
+        {/* <InputTest></InputTest> */}
       </div>
     </div>
   );

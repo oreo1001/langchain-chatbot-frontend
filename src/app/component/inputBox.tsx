@@ -1,6 +1,5 @@
 'use client'
 
-import axios from 'axios'
 import { addMessageToList } from "@/redux/slices/chatSlice";
 import { useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";

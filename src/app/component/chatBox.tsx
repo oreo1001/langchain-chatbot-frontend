@@ -26,6 +26,7 @@ const renderContentWithImages = (content: string) => {
         </div>
     );
 };
+//나중에 이미지만 모아서 보여주게 하고 속도 측정
 
 export function AIBox({ content }: ChatBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-7 whitespace-pre-line';

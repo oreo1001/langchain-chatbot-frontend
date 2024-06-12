@@ -1,4 +1,5 @@
-const token = process.env.TOKEN;
+export const maxDuration = 300; // 추가한 코드
+export const dynamic = 'force-dynamic'; // 추가한 코드
 
 export async function GET() {
     return new Response('Hello, Next.js!');
@@ -7,9 +8,8 @@ export async function GET() {
 export async function POST(request: Request) {
     const { question } = await request.json();
 
-    const api_url = 'https://back.anvi.life'
     try {
-        const response = await fetch(api_url + '/chat/messages', {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/chat/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

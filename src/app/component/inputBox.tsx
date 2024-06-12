@@ -32,10 +32,7 @@ export default function InputBox() {
                 },
                 body: JSON.stringify({ question: inputValue }),
             });
-            const test = await response;
-            console.log(test)
             const responseJson = await response.json();
-            console.log(responseJson);
             const chatMessages = responseJson.data.messages;
             dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
         } catch (error) {

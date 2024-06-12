@@ -1,5 +1,6 @@
 'use client'
 
+import axios from 'axios'
 import { addMessageToList } from "@/redux/slices/chatSlice";
 import { useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
@@ -26,32 +27,19 @@ export default function InputBox() {
         // const controller = new AbortController();
         // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃 설정
 
-        const localUrl = 'https://localhost:3000'
-        const productionUrl = 'https://www.anvi.life'
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify({ question: inputValue }),
-                // signal: controller.signal,
-            });
-            // clearTimeout(timeoutId); // 타임아웃 해제
-            // if (!response.ok) {
-            //     throw new Error(`HTTP error! status: ${response.status}`);
-            // }
-            const test = await response;
-            console.log(test)
-            const responseJson = await response.json();
-            console.log(responseJson);
-            const chatMessages = responseJson.data.messages;
-            dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoading(false); // 로딩 상태 해제
-        }
+        let response = await axios.post(process.env.NEXT_PUBLIC_THIS_APP_URL + '/api/chat',
+            {
+                question: inputValue
+            },
+            {
+                withCredentials: true,
+            }
+        )
+        const chatMessages = response.data.messages;
+        console.log(response)
+        dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
+
+        setLoading(false)
     };
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {

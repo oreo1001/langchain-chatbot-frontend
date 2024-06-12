@@ -22,6 +22,8 @@ export default function InputBox() {
         dispatch(addMessageToList({ content: inputValue, speaker: 'human' }));
         setInputValue(''); // 메시지 전송 후 입력 필드 초기화
         setLoading(true); // 로딩 상태로 설정
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃 설정
 
         try {
             const response = await fetch('/api/chat', {
@@ -30,7 +32,14 @@ export default function InputBox() {
                     'Content-type': 'application/json',
                 },
                 body: JSON.stringify({ question: inputValue }),
+                signal: controller.signal,
             });
+            clearTimeout(timeoutId); // 타임아웃 해제
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const test = await response;
+            console.log(test)
             const responseJson = await response.json();
             console.log(responseJson);
             const chatMessages = responseJson.data.messages;

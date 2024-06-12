@@ -6,6 +6,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
     const { question } = await request.json();
+
     const api_url = 'https://back.anvi.life'
     try {
         const response = await fetch(api_url + '/chat/messages', {

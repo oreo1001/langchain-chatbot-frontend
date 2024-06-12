@@ -26,8 +26,10 @@ export default function InputBox() {
         // const controller = new AbortController();
         // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃 설정
 
+        const localUrl = 'https://localhost:3000'
+        const productionUrl = 'https://www.anvi.life'
         try {
-            const response = await fetch('/api/chat', {
+            const response = await fetch(productionUrl + '/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',

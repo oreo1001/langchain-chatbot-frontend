@@ -7,6 +7,23 @@ interface HumanBoxProps {
     speaker: 'human' | 'ai';
     content: string;
 }
+const LINK_REGEX = /((https?:\/\/[^\s]+))/g;
+
+const formatTextWithLinks = (text: string) => {
+    const parts = text.split(LINK_REGEX);
+
+    return parts.map((part, index) => {
+        if (part.match(LINK_REGEX)) {
+            return (
+                <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    {part}
+                </a>
+            );
+        } else {
+            return part;
+        }
+    });
+};
 
 const renderContentWithImages = (content: string) => {
     const regex = /https:\/\/[^ ]+\.(?:png|jpg|jpeg|gif)/g;

@@ -54,16 +54,18 @@ export default function ChatMain() {
 
         newEventSource.onmessage = (event) => {
             setData(prevData => {
-                const updatedData = [...prevData, event.data];
-                const lastMessage = updatedData[updatedData.length - 1];
-                if (lastMessage.endsWith('Done')) { // 마지막 4글자가 'Done'이면
+                const updatedMessage = event.data.replace(/🖐️/g, '\n');
+                const updatedData = [...prevData, updatedMessage];
+                if (event.data.includes('\u200C')) { // 마지막 메시지가 'Done'을 포함하면
                     newEventSource.close(); // EventSource 닫기
                     console.log('EventSource closed because of "Done" message');
                     setLoading(false);
                 }
                 return updatedData;
             });
+            console.log(data)
         };
+
     }
     useEffect(() => {
         return () => {

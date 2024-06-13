@@ -52,23 +52,14 @@ export default function ChatMain() {
         const newEventSource = new EventSource('http://localhost:5000/stream/test');
         setEventSource(newEventSource);
 
-        const resetTimeout = () => {
-            if (timeoutId) clearTimeout(timeoutId);
-            const newTimeoutId = setTimeout(() => {
-                newEventSource.close();
-                console.log('EventSource closed due to inactivity');
-            }, 10000); // 10초 동안 이벤트가 발생하지 않으면 EventSource를 닫습니다.
-            setTimeoutId(newTimeoutId);
-        };
-
         newEventSource.onmessage = (event) => {
-            // resetTimeout(); // 이벤트 발생 시 타이머를 리셋합니다.
             setData(prevData => {
                 const updatedData = [...prevData, event.data];
                 const lastMessage = updatedData[updatedData.length - 1];
                 if (lastMessage.endsWith('Done')) { // 마지막 4글자가 'Done'이면
                     newEventSource.close(); // EventSource 닫기
                     console.log('EventSource closed because of "Done" message');
+                    setLoading(false);
                 }
                 return updatedData;
             });
@@ -118,7 +109,6 @@ export default function ChatMain() {
             <button className="flex justify-end" onClick={clickfunc} disabled={loading}>
                 {loading ? <AiOutlineLoading3Quarters className="w-7 h-7 animate-spin" /> : <TiLocationArrow className="w-7 h-7" />}
             </button>
-            {/* <p>{data}</p> */}
         </div>
     </div>
     );

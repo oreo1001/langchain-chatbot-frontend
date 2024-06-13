@@ -1,45 +1,24 @@
-import { RootState } from '@/redux/store';
-import React, { Fragment } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 
 
 interface HumanBoxProps {
     speaker: 'human' | 'ai';
     content: string;
 }
-const LINK_REGEX = /((https?:\/\/[^\s]+))/g;
-
-const formatTextWithLinks = (text: string) => {
-    const parts = text.split(LINK_REGEX);
-
-    return parts.map((part, index) => {
-        if (part.match(LINK_REGEX)) {
-            return (
-                <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                    {part}
-                </a>
-            );
-        } else {
-            return part;
-        }
-    });
-};
 
 const renderContentWithImages = (content: string) => {
     const regex = /https:\/\/[^ ]+\.(?:png|jpg|jpeg|gif)/g;
     const parts = content.split(regex);
     const matches = content.match(regex);
 
-    if (!matches) {
-        return <p>{content}</p>;
-    }
-
     return (
         <div>
             {parts.map((part, index) => (
                 <React.Fragment key={index}>
-                    <span>{part}</span>
-                    {matches[index] && <img src={matches[index]} alt={`Image ${index}`} className="my-4" />}
+                    {part}
+                    {matches && matches[index] && (
+                        <img key={index} src={matches[index]} alt={`Image ${index}`} className="my-4" />
+                    )}
                 </React.Fragment>
             ))}
         </div>
@@ -61,9 +40,9 @@ export function AIBox({ data }: ChatBoxProps) {
                 <div className="w-10 h-10 rounded-xl ml-3 mr-2">
                     <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
                 </div>
-                <div className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
-                    {data}
-                </div>
+                <span className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
+                {renderContentWithImages(data.join(''))}
+                </span>
             </div>
         </div>
     );
@@ -81,14 +60,15 @@ export function HumanBox({ content }: HumanBoxProps) {
         </div>
     );
 }
+export function ChatBox({ content }: HumanBoxProps) {
+    const messageStyle = 'bg-[#F4F4F4] tracking-normal leading-7 whitespace-pre-wrap';
+    const alignment = 'justify-start';
 
-export function ChatBox(messages: string[]) {
     return (
-        <div>
-            {/* {messages.map((message: ChatBoxProps, index: number) => (
-                <AIBox key={index} speaker={message.speaker} content={message.content} />
-            ))} */}
-            {messages}
+        <div className={`flex ${alignment} p-2`}>
+            <div className={`rounded-lg p-3 ${messageStyle}`}>
+                {content}
+            </div>
         </div>
     );
 }

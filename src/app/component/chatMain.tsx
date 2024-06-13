@@ -5,7 +5,7 @@ import { addMessageToList, getMessageList } from '@/redux/slices/chatSlice';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { TiLocationArrow } from 'react-icons/ti';
-import { AIBox, HumanBox } from './chatBox';
+import { AIBox, ChatBox, HumanBox } from './chatBox';
 
 export default function ChatMain() {
     interface ChatMessage {
@@ -36,9 +36,9 @@ export default function ChatMain() {
     const dispatch = useAppDispatch()
     const clickfunc = async (event: React.FormEvent) => {
         event.preventDefault();
+        dispatch(addMessageToList({ content: data.join(''), speaker: 'ai' }));
         setInputValue(''); // 메시지 전송 후 입력 필드 초기화
         if (loading) return; // 이미 로딩 중일 때는 중복 클릭 방지
-
         dispatch(addMessageToList({ content: inputValue, speaker: 'human' }));
         setLoading(true);
         const response = await fetch('http://localhost:5000/stream/ask', {
@@ -65,7 +65,6 @@ export default function ChatMain() {
             });
             console.log(data)
         };
-
     }
     useEffect(() => {
         return () => {
@@ -73,7 +72,9 @@ export default function ChatMain() {
         };
     }, [eventSource]);
 
-    return (<div className="flex-grow overflow-y-auto">
+    console.log(messageList)
+    return (
+    <div className="flex-grow overflow-y-auto">
         <div className="flex flex-row items-start px-2">
             <div className="w-10 h-10 rounded-xl ml-3 mr-2">
                 <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
@@ -90,14 +91,25 @@ export default function ChatMain() {
         <div>
 
         </div>
-        <>
+        {/* <>
             {messageList.map((message: ChatMessage, index: number) => (
                 <HumanBox key={index} content={message.content} speaker={"human"} />
                 // <ChatBox key={index} content={message.content} speaker={"ai"}></ChatBox>
             ))}
             <div ref={messagesEndRef} />
         </>
-        <AIBox data={data} />
+        <AIBox data={data} /> */}
+        <>
+            {messageList.map((message: ChatMessage, index: number) => (
+                message.speaker === 'human' ? (
+                    <HumanBox key={index} content={message.content} speaker={'human'} />
+                ) : (
+                    <ChatBox key={index} content={message.content} speaker={'ai'}/>
+                )
+            ))}
+            <div ref={messagesEndRef} />
+            <AIBox data={data} />
+        </>
         <div className="flex w-full bg-[#F4F4F4] rounded-lg px-3 py-2 mb-6 mt-4 border-2 border-[#F4F4F4] focus-within:border-2 focus-within:border-red-300 group">
             <input
                 placeholder="메시지 입력"

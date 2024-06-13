@@ -1,5 +1,5 @@
-export const maxDuration = 300; // 추가한 코드
-export const dynamic = 'force-dynamic'; // 추가한 코드
+export const maxDuration = 300;
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     return new Response('Hello, Next.js!');

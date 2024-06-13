@@ -1,29 +1,18 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-import { useDispatch } from 'react-redux';
-import { addMessageToList } from '@/redux/slices/chatSlice';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { TiLocationArrow } from 'react-icons/ti';
+import { addMessageToList } from "@/redux/slices/chatSlice";
+import { useEffect, useState } from "react";
+import { TiLocationArrow } from "react-icons/ti";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useAppDispatch } from '@/redux/hooks';
+import { eventNames } from "process";
 
-const socket = io('http://localhost:5000'); // WebSocket server address
-
-const InputTest: React.FC = () => {
+export default function InputBox() {
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
-    const [messages, setMessages] = useState<string[]>([]);
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        socket.on('response', (data) => {
-            setMessages((prevMessages) => [...prevMessages, data.message]);
-        });
-
-        return () => {
-            socket.off('response');
-        };
-    }, []);
+    const dispatch = useAppDispatch();
+    const [eventSource, setEventSource] = useState<EventSource | null>(null);
+    const [data, setData] = useState<string>('');
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
@@ -31,37 +20,48 @@ const InputTest: React.FC = () => {
 
     const handleSearch = async (event: React.FormEvent) => {
         event.preventDefault();
-        if (loading) return;
+        if (loading) return; // 이미 로딩 중일 때는 중복 클릭 방지
 
         dispatch(addMessageToList({ content: inputValue, speaker: 'human' }));
-        setInputValue('');
-        setLoading(true);
+        setInputValue(''); // 메시지 전송 후 입력 필드 초기화
+        setLoading(true); // 로딩 상태로 설정
 
-        // Emit WebSocket message
-        socket.emit('message', { question: inputValue });
-
-        // Make HTTP POST request
         try {
-            const response = await fetch('http://localhost:5000/api/chat', {
+            const response = await fetch('http://localhost:5000/stream/messages', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-type': 'application/json',
                 },
-                body: JSON.stringify({ question: inputValue }),
+                body: JSON.stringify({ question: inputValue, session_id: '123' }),
             });
+            // const responseJson = await response.json();
+            // const chatMessages = responseJson.data.messages;
+            // dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // 기존 EventSource 닫기
+            if (eventSource) {
+                eventSource.close();
             }
 
-            const responseJson = await response.json();
-            console.log(responseJson);
-            // Process HTTP response here if needed
+            // 새로운 EventSource 열기
+            const newEventSource = new EventSource('http://localhost:5000/stream/messages');
+            newEventSource.onmessage = function (event) {
+                const newMessage = event.data;
+                console.log(newMessage)
+                dispatch(addMessageToList({ content: newMessage, speaker: 'ai' }));
+                setData(event.data);
+            };
+            newEventSource.onerror = function (error) {
+                console.error('EventSource error:', error);
+                newEventSource.close();
+            };
+            setEventSource(newEventSource);
+            console.log(newEventSource)
         } catch (error) {
-            console.error('HTTP request failed:', error);
+            console.error('Error:', error);
+        } finally {
+            setLoading(false); // 로딩 상태 해제
         }
-
-        setLoading(false);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -69,6 +69,15 @@ const InputTest: React.FC = () => {
             handleSearch(event);
         }
     };
+
+    // 컴포넌트 언마운트 시 EventSource 닫기
+    useEffect(() => {
+        return () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
+    }, [eventSource]);
 
     return (
         <div className="flex w-full bg-[#F4F4F4] rounded-lg px-3 py-2 mb-6 mt-4 border-2 border-[#F4F4F4] focus-within:border-2 focus-within:border-red-300 group">
@@ -84,34 +93,7 @@ const InputTest: React.FC = () => {
             <button className="flex justify-end" onClick={handleSearch} disabled={loading}>
                 {loading ? <AiOutlineLoading3Quarters className="w-7 h-7 animate-spin" /> : <TiLocationArrow className="w-7 h-7" />}
             </button>
-            <div>
-                {messages.map((message, index) => (
-                    <div key={index}>{renderContentWithImages(message)}</div>
-                ))}
-            </div>
+            <p>{data}</p>
         </div>
     );
-};
-
-const renderContentWithImages = (content: string) => {
-    const regex = /https:\/\/[^ ]+\.(?:png|jpg|jpeg|gif)/g;
-    const parts = content.split(regex);
-    const matches = content.match(regex);
-
-    if (!matches) {
-        return <p>{content}</p>;
-    }
-
-    return (
-        <div>
-            {parts.map((part, index) => (
-                <React.Fragment key={index}>
-                    <span>{part}</span>
-                    {matches[index] && <img src={matches[index]} alt={`Image ${index}`} className="my-4" />}
-                </React.Fragment>
-            ))}
-        </div>
-    );
-};
-
-export default InputTest;
+}

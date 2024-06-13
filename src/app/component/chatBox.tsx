@@ -12,7 +12,7 @@ const renderContentWithImages = (content: string) => {
     const matches = content.match(regex);
 
     return (
-        <div>
+        <>
             {parts.map((part, index) => (
                 <React.Fragment key={index}>
                     {part}
@@ -21,7 +21,7 @@ const renderContentWithImages = (content: string) => {
                     )}
                 </React.Fragment>
             ))}
-        </div>
+        </>
     );
 };
 //나중에 이미지만 모아서 보여주게 하고 속도 측정
@@ -29,8 +29,11 @@ const renderContentWithImages = (content: string) => {
 interface ChatBoxProps {
     data: string[];
 }
+interface AIBoxProps{
+    content:string;
+}
 
-export function AIBox({ data }: ChatBoxProps) {
+export function AIBox( {content} : AIBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-7 whitespace-pre-wrap';
     const alignment = 'justify-start';
 
@@ -41,7 +44,7 @@ export function AIBox({ data }: ChatBoxProps) {
                     <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
                 </div>
                 <span className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
-                {renderContentWithImages(data.join(''))}
+                    {renderContentWithImages(content)}
                 </span>
             </div>
         </div>

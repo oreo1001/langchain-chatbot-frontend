@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage'
 
 type ChatState = {
   messageList: ChatMessage[]
+  previousMessage : string
 }
 
 interface ChatMessage {
@@ -15,6 +16,7 @@ interface ChatMessage {
 
 const initialState: ChatState = {
   messageList: [],
+  previousMessage : ''
 }
 
 export const chatSlice = createSlice({
@@ -25,12 +27,16 @@ export const chatSlice = createSlice({
     addMessageToList: (state, action: PayloadAction<ChatMessage>) => {
       state.messageList.push(action.payload)
     },
+    setPrevious : (state, action: PayloadAction<string>) => {
+      state.previousMessage = action.payload
+    },
   },
 })
 
 export const {
   reset,
-  addMessageToList
+  addMessageToList,
+  setPrevious
 } = chatSlice.actions
 const persistConfig = {
   key: 'chat',
@@ -38,6 +44,7 @@ const persistConfig = {
 }
 export const getChatState = (state: RootState) => state.chat
 export const getMessageList = (state: RootState) => state.chat.messageList
+export const getPrevious = (state:RootState) => state.chat.previousMessage
 const persistedChatReducer = persistReducer(persistConfig, chatSlice.reducer)
 
 export default persistedChatReducer

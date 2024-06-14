@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineClear, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { TiLocationArrow } from 'react-icons/ti';
 import { AIBox, HumanBox } from './chatBox';
-import { clearPreviewData } from 'next/dist/server/api-utils';
 
 export default function ChatMain() {
     interface ChatMessage {
@@ -14,33 +13,21 @@ export default function ChatMain() {
         content: string
     }
     // const messageList = useAppSelector(getMessageList);
-    // const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    // const scrollToBottom = () => {
-    //     if (messagesEndRef.current) {
-    //         messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     scrollToBottom();
-    // }, [messageList]);
-
 
     const [messageList, setMessageList] = useState<ChatMessage[]>([]);
-    // const [completeMessage, setCompleteMessage] = useState<string>('');
     const [data, setData] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // const [myEvent,setMyEvent] =useState<EventSource>(EventSource(null));
-    const [eventSource, setEventSource] = useState<EventSource | null>(null); // 타입 지정
-    const closeEventSource = () => {
-        if (eventSource) {
-            eventSource.close();
-            setEventSource(null);
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
+    useEffect(() => {
+        scrollToBottom();
+    }, [data]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
@@ -72,9 +59,7 @@ export default function ChatMain() {
                 },
                 body: JSON.stringify({ question: currentInputValue, session_id: '354' }),
             });
-            closeEventSource(); // 새로운 EventSource를 열기 전에 기존 것을 닫음
             const newEventSource = new EventSource('http://localhost:5000/stream/test');
-            setEventSource(newEventSource);
 
             newEventSource.onmessage = (messageEvent) => {
                 console.log(messageEvent.data)
@@ -102,13 +87,6 @@ export default function ChatMain() {
             setLoading(false);
         }
     };
-    useEffect(() => {
-        return () => {
-            if (eventSource) {
-                eventSource.close();
-            }
-        };
-    }, [eventSource]);
     return (
         <div className="flex-grow overflow-y-auto">
             <div className="flex flex-row items-start px-2">
@@ -152,7 +130,6 @@ export default function ChatMain() {
             <div className="flex flex-row justify-end w-full">
                 <AiOutlineClear height={5} onClick={handleReset}></AiOutlineClear>
             </div>
-            {data}
         </div>
     );
 }

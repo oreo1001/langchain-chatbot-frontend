@@ -52,14 +52,14 @@ export default function ChatMain() {
         setInputValue(''); // 메시지 전송 후 입력 필드 초기화
 
         try {
-            const response = await fetch('http://localhost:5000/stream/ask', {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
                 },
                 body: JSON.stringify({ question: currentInputValue, session_id: '354' }),
             });
-            const newEventSource = new EventSource('http://localhost:5000/stream/test');
+            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/test');
 
             newEventSource.onmessage = (messageEvent) => {
                 const updatedMessage = messageEvent.data.replace(/🖐️/g, '\n');

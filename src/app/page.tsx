@@ -1,9 +1,5 @@
 import Image from "next/image";
-// import ChatList from "./component/chatList";
 import React from 'react';
-import InputBox from "./component/inputBox";
-import ChatNav from "./component/chatNav";
-import InputTest from "./component/inputTest";
 import ChatMain from "./component/chatMain";
 
 export default function Home() {

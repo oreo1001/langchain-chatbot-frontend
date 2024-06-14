@@ -19,6 +19,27 @@ export default function ChatMain() {
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [sessionId, setSessionId] = useState('');
+    useEffect(() => {
+        // 처음 마운트될 때 세션 ID 생성
+        if (!sessionId) {
+            const newSessionId = generateSessionId();
+            setSessionId(newSessionId);
+        }
+    }, [sessionId]);
+
+
+    function getRandomInt(max: number): number {
+        return Math.floor(Math.random() * max);
+    }
+
+    function generateSessionId() {
+        let sessionId = '';
+        for (let i = 0; i < 8; i++) {
+            sessionId += getRandomInt(10); // 0에서 9 사이의 숫자 추가
+        }
+        return sessionId
+    }
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
@@ -34,6 +55,8 @@ export default function ChatMain() {
     };
     function handleReset() {
         setMessageList([]);
+        const sessionId = generateSessionId()
+        setSessionId(sessionId)
     }
 
     const handleKeyPress = (event: any) => {
@@ -52,12 +75,13 @@ export default function ChatMain() {
         setInputValue(''); // 메시지 전송 후 입력 필드 초기화
 
         try {
+            console.log(sessionId)
             const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
                 },
-                body: JSON.stringify({ question: currentInputValue, session_id: '354' }),
+                body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
             });
             const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/test');
 

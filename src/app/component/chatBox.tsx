@@ -28,9 +28,10 @@ const renderContentWithImages = (content: string) => {
 
 interface AIBoxProps {
     content: string;
+    loading: boolean;
 }
 
-export function AIBox({ content }: AIBoxProps) {
+export function AIBox({ content, loading }: AIBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-7 whitespace-pre-wrap';
     const alignment = 'justify-start';
 
@@ -41,7 +42,13 @@ export function AIBox({ content }: AIBoxProps) {
                     <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
                 </div>
                 <span className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
-                    {renderContentWithImages(content)}
+                    {loading ? (
+                        <div className="flex items-center">
+                            <div className="mr-2"></div> Loading...
+                        </div>
+                    ) : (
+                        renderContentWithImages(content)
+                    )}
                 </span>
             </div>
         </div>

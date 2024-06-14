@@ -62,7 +62,6 @@ export default function ChatMain() {
             const newEventSource = new EventSource('http://localhost:5000/stream/test');
 
             newEventSource.onmessage = (messageEvent) => {
-                console.log(messageEvent.data)
                 const updatedMessage = messageEvent.data.replace(/🖐️/g, '\n');
                 setData(prevData => [...prevData, updatedMessage]);
                 if (messageEvent.data.includes('\u200C')) { // 마지막 메시지가 'Done'을 포함하면
@@ -111,7 +110,7 @@ export default function ChatMain() {
                     )
                 ))}
                 {loading && <AIBox content={data.join('')} />}
-                {/* <div ref={messagesEndRef} /> */}
+                <div ref={messagesEndRef} />
             </div>
             <div className="flex w-full bg-[#F4F4F4] rounded-lg px-3 py-2 mb-6 mt-4 border-2 border-[#F4F4F4] focus-within:border-2 focus-within:border-red-300 group">
                 <input

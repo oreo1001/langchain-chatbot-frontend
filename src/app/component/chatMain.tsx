@@ -3,50 +3,66 @@
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { addMessageToList, getMessageList, getPrevious, setPrevious } from '@/redux/slices/chatSlice';
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { AiOutlineClear, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { TiLocationArrow } from 'react-icons/ti';
 import { AIBox, HumanBox } from './chatBox';
+import { clearPreviewData } from 'next/dist/server/api-utils';
 
 export default function ChatMain() {
     interface ChatMessage {
         speaker: 'human' | 'ai'
         content: string
     }
-    const messageList = useAppSelector(getMessageList);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    // const messageList = useAppSelector(getMessageList);
+    // const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
+    // const scrollToBottom = () => {
+    //     if (messagesEndRef.current) {
+    //         messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    //     }
+    // };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messageList]);
+    // useEffect(() => {
+    //     scrollToBottom();
+    // }, [messageList]);
 
+
+    const [messageList, setMessageList] = useState<ChatMessage[]>([]);
+    // const [completeMessage, setCompleteMessage] = useState<string>('');
     const [data, setData] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // const [myEvent,setMyEvent] =useState<EventSource>(EventSource(null));
+    const [eventSource, setEventSource] = useState<EventSource | null>(null); // 타입 지정
+    const closeEventSource = () => {
+        if (eventSource) {
+            eventSource.close();
+            setEventSource(null);
+        }
+    };
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
     };
+    function handleReset() {
+        setMessageList([]);
+    }
 
-    const dispatch = useAppDispatch();
+    const handleKeyPress = (event: any) => {
+        if (event.key === 'Enter') {
+            clickfunc(event);
+        }
+    };
 
     const clickfunc = async (event: React.FormEvent) => {
         event.preventDefault();
-        setInputValue(''); // 메시지 전송 후 입력 필드 초기화
-        // setData([]);
-
-        if (data.length > 0) {
-            setData([]); // 데이터 초기화
-        }
 
         if (loading) return; // 이미 로딩 중일 때는 중복 클릭 방지
-        dispatch(addMessageToList({ content: inputValue, speaker: 'human' }));
         setLoading(true);
+        const currentInputValue = inputValue;
+        messageList.push({ content: currentInputValue, speaker: 'human' })
+        setInputValue(''); // 메시지 전송 후 입력 필드 초기화
 
         try {
             const response = await fetch('http://localhost:5000/stream/ask', {
@@ -54,24 +70,28 @@ export default function ChatMain() {
                 headers: {
                     'Content-type': 'application/json',
                 },
-                body: JSON.stringify({ question: inputValue, session_id: '354' }),
+                body: JSON.stringify({ question: currentInputValue, session_id: '354' }),
             });
-            console.log(response)
+            closeEventSource(); // 새로운 EventSource를 열기 전에 기존 것을 닫음
             const newEventSource = new EventSource('http://localhost:5000/stream/test');
-            newEventSource.onmessage = (event) => {
-                setData(prevData => {
-                    const updatedMessage = event.data.replace(/🖐️/g, '\n');
-                    const updatedData = [...prevData, updatedMessage];
+            setEventSource(newEventSource);
 
-                    if (event.data.includes('\u200C')) { // 마지막 메시지가 'Done'을 포함하면
-                        console.log('EventSource closed');
-                        dispatch(addMessageToList({ content: updatedMessage, speaker: 'ai' }));
-                        newEventSource.close(); // EventSource 닫기
-                        setLoading(false);
-                    }
-                    return updatedData;
-                });
+            newEventSource.onmessage = (messageEvent) => {
+                console.log(messageEvent.data)
+                const updatedMessage = messageEvent.data.replace(/🖐️/g, '\n');
+                setData(prevData => [...prevData, updatedMessage]);
+                if (messageEvent.data.includes('\u200C')) { // 마지막 메시지가 'Done'을 포함하면
+                    setData(prevData => {
+                        const completeMessage = prevData.join('');
+                        messageList.push({ content: completeMessage, speaker: 'ai' })
+                        return [];
+                    });
+                    newEventSource.close(); // EventSource 닫기
+                    setLoading(false);
+                    setData([]);
+                }
             };
+
             newEventSource.onerror = (error) => {
                 console.error('EventSource error:', error);
                 newEventSource.close();
@@ -82,7 +102,13 @@ export default function ChatMain() {
             setLoading(false);
         }
     };
-    console.log(messageList);
+    useEffect(() => {
+        return () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
+    }, [eventSource]);
     return (
         <div className="flex-grow overflow-y-auto">
             <div className="flex flex-row items-start px-2">
@@ -103,10 +129,10 @@ export default function ChatMain() {
                     message.speaker === 'human' ? (
                         <HumanBox key={index} content={message.content} speaker={'human'} />
                     ) : (
-                        <AIBox key={index} content={message.content}/>
+                        <AIBox key={index} content={message.content} />
                     )
                 ))}
-                {data.length > 0 && <AIBox content={data.join('')} />}
+                {loading && <AIBox content={data.join('')} />}
                 {/* <div ref={messagesEndRef} /> */}
             </div>
             <div className="flex w-full bg-[#F4F4F4] rounded-lg px-3 py-2 mb-6 mt-4 border-2 border-[#F4F4F4] focus-within:border-2 focus-within:border-red-300 group">
@@ -114,6 +140,7 @@ export default function ChatMain() {
                     placeholder="메시지 입력"
                     type="text"
                     value={inputValue}
+                    onKeyDown={handleKeyPress}
                     onChange={handleInputChange}
                     className="w-full focus:outline-none bg-transparent text-slate-600"
                 />
@@ -122,6 +149,10 @@ export default function ChatMain() {
                     {loading ? <AiOutlineLoading3Quarters className="w-7 h-7 animate-spin" /> : <TiLocationArrow className="w-7 h-7" />}
                 </button>
             </div>
+            <div className="flex flex-row justify-end w-full">
+                <AiOutlineClear height={5} onClick={handleReset}></AiOutlineClear>
+            </div>
+            {data}
         </div>
     );
 }

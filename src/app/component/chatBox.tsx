@@ -7,33 +7,30 @@ interface HumanBoxProps {
 }
 
 const renderContentWithImages = (content: string) => {
-    const regex = /https:\/\/[^ ]+\.(?:png|jpg|jpeg|gif)/g;
+    const regex = /(https:\/\/[^ \n]+\.(?:png|jpg|jpeg|gif))/g;
     const parts = content.split(regex);
-    const matches = content.match(regex);
 
     return (
         <>
-            {parts.map((part, index) => (
-                <React.Fragment key={index}>
-                    {part}
-                    {matches && matches[index] && (
-                        <img key={index} src={matches[index]} alt={`Image ${index}`} className="my-4" />
-                    )}
-                </React.Fragment>
-            ))}
+            {parts.map((part, index) => {
+                // 이미지 URL일 경우 <img> 태그로 렌더링
+                if (regex.test(part)) {
+                    return <img key={index} src={part} alt={`Image ${index}`} className="my-4" />;
+                }
+                // 이미지 URL이 아닐 경우 텍스트로 렌더링
+                return <React.Fragment key={index}>{part}</React.Fragment>;
+            })}
         </>
     );
 };
+
 //나중에 이미지만 모아서 보여주게 하고 속도 측정
 
-interface ChatBoxProps {
-    data: string[];
-}
-interface AIBoxProps{
-    content:string;
+interface AIBoxProps {
+    content: string;
 }
 
-export function AIBox( {content} : AIBoxProps) {
+export function AIBox({ content }: AIBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-7 whitespace-pre-wrap';
     const alignment = 'justify-start';
 

@@ -49,9 +49,9 @@ export default function BoardPage() {
                     <div className='flex w-full justify-start'>
                         <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={() => router.push('/board')}>목록</button>
                     </div>
+                    <AIResponse content={board.content} title={board.title} />
                 </div>
             </div>
-            <AIResponse content={board.content} title={board.title} />
         </>
     );
 };

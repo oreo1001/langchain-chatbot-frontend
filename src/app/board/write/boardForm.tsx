@@ -29,24 +29,24 @@ export default function BoardForm() {
         setId(generatedId);
         dispatch(uploadBoard({ id: generatedId, title: title, content: content }));
         router.push(`/board/${generatedId}`);
-        // setLoading(true); // 로딩 상태로 설정
-        // try {
-        //     const response = await fetch('/api/chat', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ question: content }),
-        //     });
-        //     const responseJson = await response.json();
-        //     console.log(responseJson);
-        //     // const chatMessages = responseJson.data.messages;
-        //     // dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
-        // } catch (error) {
-        //     console.error('Error:', error);
-        // } finally {
-        //     setLoading(false); // 로딩 상태 해제
-        // }
+        setLoading(true); // 로딩 상태로 설정
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify({ question: content }),
+            });
+            const responseJson = await response.json();
+            console.log(responseJson);
+            // const chatMessages = responseJson.data.messages;
+            // dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setLoading(false); // 로딩 상태 해제
+        }
     };
     const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {

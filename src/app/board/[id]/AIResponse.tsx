@@ -8,8 +8,8 @@ export function AIResponse({ content }: ResponseProps) {
     const alignment = 'justify-start';
 
     return (
-        <div className={`flex ${alignment} px-2 py-5`}>
-            <div>
+        <div className={`flex ${alignment} mt-8 w-full h-full rounded border-2 border-purple-300`}>
+            <div className="px-2 py-5">
                 {content}
             </div>
         </div>

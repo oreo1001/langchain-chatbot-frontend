@@ -24,14 +24,8 @@ const BoardHome: React.FC = () => {
                         <div className='flex w-52 justify-center'>제목</div>
                         <div className='flex w-96 justify-center'>내용</div>
                     </div>
-                    <div className='flex flex-row py-2'>
-                        <div className='flex w-56 justify-center'>13482012</div>
-                        <div className='flex w-52 justify-start'>첫 게시글</div>
-                        <div className="flex w-80 h-12 justify-start text-ellipsis overflow-hidden whitespace-nowrap">ㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇㄴ</div>
-                    </div>
+                    <BoardList />
                 </div>
-                <div className='h-[400px]'></div>
-                <BoardList />
             </div>
         </div>
     );

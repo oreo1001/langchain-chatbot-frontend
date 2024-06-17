@@ -65,7 +65,7 @@ export default function ChatMain() {
             body: JSON.stringify({ session_id: sessionId }),
         });
         const responseJson = await response.json();
-        console.log(responseJson.messages)
+        console.log(responseJson.message)
         setMessageList([]);
     }
 
@@ -94,7 +94,10 @@ export default function ChatMain() {
                 },
                 body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
             });
-            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages');
+            const responseJson = await response.json()
+            console.log(responseJson)
+            //const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages');
+            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages'+'?session_id='+sessionId);
 
             newEventSource.onmessage = (messageEvent) => {
                 setLoading(false)

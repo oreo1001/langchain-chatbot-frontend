@@ -1,14 +1,11 @@
 'use client'
-
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { addMessageToList, getMessageList, getPrevious, setPrevious } from '@/redux/slices/chatSlice';
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlineClear, AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { TiLocationArrow } from 'react-icons/ti';
-import { AIBox, HumanBox } from './chatBox';
+import { AIBox, HumanBox } from '../component/chatBox';
 import { RiChatSmile2Line } from 'react-icons/ri';
 
-export default function ChatMain() {
+export default function TestMain() {
     interface ChatMessage {
         speaker: 'human' | 'ai'
         content: string
@@ -36,12 +33,20 @@ export default function ChatMain() {
         return Math.floor(Math.random() * max);
     }
 
-    function generateSessionId() {
+    function getRandomChar(): string {
+        const chars = 'abcdefghijklmnopqrstuvwxyz';
+        return chars.charAt(getRandomInt(chars.length));
+    }
+
+    function generateSessionId(): string {
         let sessionId = '';
-        for (let i = 0; i < 8; i++) {
-            sessionId += getRandomInt(10); // 0에서 9 사이의 숫자 추가
+        for (let i = 0; i < 4; i++) {
+            sessionId += getRandomChar(); // 문자 추가
         }
-        return sessionId
+        for (let i = 0; i < 4; i++) {
+            sessionId += getRandomInt(10); // 숫자 추가
+        }
+        return sessionId;
     }
 
     const scrollToBottom = () => {
@@ -80,14 +85,14 @@ export default function ChatMain() {
 
         try {
             console.log(sessionId)
-            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/temp', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
                 },
                 body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
             });
-            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages');
+            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/test');
 
             newEventSource.onmessage = (messageEvent) => {
                 setLoading(false)

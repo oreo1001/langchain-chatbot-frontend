@@ -30,16 +30,17 @@ export default function BoardForm() {
         dispatch(uploadBoard({ id: generatedId, title: title, content: content }));
         router.push(`/board/${generatedId}`);
         setLoading(true); // 로딩 상태로 설정
+
         try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify({ question: content }),
-            });
-            const responseJson = await response.json();
-            console.log(responseJson);
+            // const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
+            // });
+            //const responseJson = await response.json();
+            //console.log(responseJson);
             // const chatMessages = responseJson.data.messages;
             // dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
         } catch (error) {

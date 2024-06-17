@@ -61,10 +61,17 @@ export default function TestMain() {
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
     };
-    function handleReset() {
+    async function handleReset() {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messagesTest', {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify({ session_id: sessionId }),
+        });
+        const responseJson = await response.json();
+        console.log(responseJson.messages)
         setMessageList([]);
-        const sessionId = generateSessionId()
-        setSessionId(sessionId)
     }
 
     const handleKeyPress = (event: any) => {
@@ -85,14 +92,14 @@ export default function TestMain() {
 
         try {
             console.log(sessionId)
-            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/temp', {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messagesTest', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',
                 },
                 body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
             });
-            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/test');
+            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messagesTest');
 
             newEventSource.onmessage = (messageEvent) => {
                 setLoading(false)

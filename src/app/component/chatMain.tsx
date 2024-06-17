@@ -56,10 +56,17 @@ export default function ChatMain() {
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
     };
-    function handleReset() {
+    async function handleReset() {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages', {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify({ session_id: sessionId }),
+        });
+        const responseJson = await response.json();
+        console.log(responseJson.messages)
         setMessageList([]);
-        const sessionId = generateSessionId()
-        setSessionId(sessionId)
     }
 
     const handleKeyPress = (event: any) => {
@@ -80,7 +87,7 @@ export default function ChatMain() {
 
         try {
             console.log(sessionId)
-            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json',

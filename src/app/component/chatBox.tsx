@@ -1,4 +1,6 @@
 import React from 'react';
+import Lottie from 'react-lottie-player';
+import loadingJson2 from '../../../public/assets/loading2.json'
 
 
 interface HumanBoxProps {
@@ -43,8 +45,13 @@ export function AIBox({ content, loading }: AIBoxProps) {
                 </div>
                 <span className={`pl-2 pt-1 w-[600px] rounded-lg ${messageStyle}`}>
                     {loading ? (
-                        <div className="flex items-center">
-                            <div className="mr-2"></div> Loading...
+                        <div className="flex items-center justify-center">
+                            <Lottie
+                                loop
+                                animationData={loadingJson2}
+                                play
+                                style={{ width: 400, height: 300 }}
+                            ></Lottie>
                         </div>
                     ) : (
                         renderContentWithImages(content)

@@ -34,6 +34,7 @@ const persistConfig = {
 }
 export const getBoard = (state: RootState) => state.board
 export const getBoardList = (state: RootState) => state.board.boardList
+export const countBoardList = (state: RootState) => state.board.boardList.length
 const persistedBoardReducer = persistReducer(persistConfig, boardSlice.reducer)
 
 export default persistedBoardReducer

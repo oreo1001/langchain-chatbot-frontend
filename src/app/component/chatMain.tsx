@@ -24,12 +24,12 @@ export default function ChatMain() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [sessionId, setSessionId] = useState('');
     useEffect(() => {
-        // 처음 마운트될 때 세션 ID 생성
+        // 처음 마운트될 때 세션 ID 생성 [sessionId]
         if (!sessionId) {
             const newSessionId = generateSessionId();
             setSessionId(newSessionId);
         }
-    }, [sessionId]);
+    }, []);
 
 
     function getRandomInt(max: number): number {
@@ -117,6 +117,9 @@ export default function ChatMain() {
                 setData(prevData => [...prevData, "정상적이지 않은 질문입니다. 다시 질문해주세요."]); // 오류 메시지 추가
                 messageList.push({ content: "정상적이지 않은 질문입니다. 다시 질문해주세요.", speaker: 'ai' })
                 newEventSource.close();
+                setTimeout(() => {
+                    console.log('2초 기다리기');
+                }, 2000);
                 setStreaming(false);
                 setData([]);
             };

@@ -21,12 +21,11 @@ export default function TestMain() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [sessionId, setSessionId] = useState('');
     useEffect(() => {
-        // 처음 마운트될 때 세션 ID 생성
         if (!sessionId) {
             const newSessionId = generateSessionId();
             setSessionId(newSessionId);
         }
-    }, [sessionId]);
+    }, []);
 
 
     function getRandomInt(max: number): number {

@@ -112,8 +112,11 @@ export default function TestMain() {
 
             newEventSource.onerror = (error) => {
                 console.error('EventSource error:', error);
+                setData(prevData => [...prevData, "정상적이지 않은 질문입니다. 다시 질문해주세요."]); // 오류 메시지 추가
+                messageList.push({ content: "정상적이지 않은 질문입니다. 다시 질문해주세요.", speaker: 'ai' })
                 newEventSource.close();
                 setStreaming(false);
+                setData([]);
             };
         } catch (error) {
             console.error('Error:', error);

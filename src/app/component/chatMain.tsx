@@ -150,7 +150,7 @@ export default function ChatMain() {
                             <span>반갑습니다!</span>
                             <span role="img" aria-label="hi">🖐️</span>
                         </div>
-                        <div className="flex tracking-normal leading-7 whitespace-pre-line pb-2">저는 업무 매니얼 Q&A봇입니다.</div>
+                        <div className="flex tracking-normal leading-7 whitespace-pre-line pb-2">저는 BGF AI 챗봇입니다.</div>
                         <div className="flex tracking-normal leading-7 whitespace-pre-line pb-2">궁금한 사항에 대해 질문해 주세요!</div>
                     </div>
                 </div>

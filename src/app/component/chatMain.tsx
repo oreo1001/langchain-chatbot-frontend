@@ -29,7 +29,7 @@ export default function ChatMain() {
             const newSessionId = generateSessionId();
             setSessionId(newSessionId);
         }
-    }, []);
+    }, [sessionId]);
 
 
     function getRandomInt(max: number): number {
@@ -97,7 +97,7 @@ export default function ChatMain() {
             const responseJson = await response.json()
             console.log(responseJson)
             //const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages');
-            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages'+'?session_id='+sessionId);
+            const newEventSource = new EventSource(process.env.NEXT_PUBLIC_API_SERVER + '/stream/messages' + '?session_id=' + sessionId);
 
             newEventSource.onmessage = (messageEvent) => {
                 setLoading(false)

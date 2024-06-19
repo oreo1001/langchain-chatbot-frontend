@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
-import { uploadBoard } from '@/redux/slices/boardSlice';
+import { setLoading, uploadBoard } from '@/redux/slices/boardSlice';
+import { setComment } from '@/redux/slices/commentSlice';
 import { useRouter } from 'next/navigation';
 
 export default function BoardForm() {
-    const [id, setId] = useState<number | null>(null);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
 
     const dispatch = useAppDispatch();
 
@@ -19,39 +19,36 @@ export default function BoardForm() {
     const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(event.target.value);
     };
-    //console.log(typeof (Math.floor(Math.random() * 1000000)))
-
+    const handleKeyPress = (event: any) => {
+        if (event.key === 'Enter') {
+            handleWrite(event);
+        }
+    };
     const handleWrite = async (event: any) => {
         event.preventDefault();
-        if (loading) return; // 이미 로딩 중일 때는 중복 클릭 방지
 
         const generatedId = Math.floor(Math.random() * 1000000);
-        setId(generatedId);
-        dispatch(uploadBoard({ id: generatedId, title: title, content: content }));
+        dispatch(uploadBoard({ id: generatedId, title: title, content: content, dateTime: Date.now().toString() }));
+        dispatch(setLoading(true)); // 로딩 상태로 설정
         router.push(`/board/${generatedId}`);
-        setLoading(true); // 로딩 상태로 설정
+        var inputValue = title + " " + content
 
         try {
-            // const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/stream/ask', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ question: currentInputValue, session_id: sessionId }),
-            // });
-            //const responseJson = await response.json();
-            //console.log(responseJson);
-            // const chatMessages = responseJson.data.messages;
-            // dispatch(addMessageToList(chatMessages[chatMessages.length - 1]));
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/chat/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify({ id: generatedId, question: inputValue, }),
+            });
+            const responseJson = await response.json();
+            dispatch(setComment(responseJson.messages))
+            console.log(responseJson);
+            dispatch(setLoading(true));
         } catch (error) {
             console.error('Error:', error);
         } finally {
             setLoading(false); // 로딩 상태 해제
-        }
-    };
-    const handleKeyPress = (event: any) => {
-        if (event.key === 'Enter') {
-            handleWrite(event);
         }
     };
 
@@ -84,14 +81,15 @@ export default function BoardForm() {
                 className="w-full px-3 py-2 text-gray-700 resize-none outline-none"
                 placeholder="여기에 내용을 입력하세요..."
             ></textarea>
-            <div className='flex flex-row w-full'>
+            <div className='flex flex-row w-full pb-5'>
                 <div className='flex flex-grow justify-start'>
                     <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={() => router.push('/board')}>목록</button>
                 </div>
                 <div className='flex justify-end'>
-                    <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={handleWrite} disabled={loading}>글쓰기</button>
+                    <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={handleWrite}>글쓰기</button>
                 </div>
             </div>
+            <div className='border-t-2 w-[600px]'></div>
         </div>
     );
 };

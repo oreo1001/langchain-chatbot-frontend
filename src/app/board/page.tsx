@@ -19,15 +19,18 @@ const BoardHome: React.FC = () => {
                 </div>
                 <div className='flex flex-col w-[900px] pt-[200px]'>
                     <div className='flex flex-row items-center mb-1'>
-                        <div className='flex flex-grow'>글목록(전체 글 : {countBoards})</div>
+                        <div className='flex flex-grow text font-medium'>글목록(전체 글 : {countBoards})</div>
                         <button className='bg-green-500 text-white px-2 py-1 rounded mr-1' onClick={() => router.push('/board/write')}>글쓰기</button>
                     </div>
-                    <div className='flex flex-row border-t-[3px] border-b-[3px]'>
-                        <div className='flex w-56 justify-center'>번호</div>
-                        <div className='flex w-52 justify-center'>제목</div>
-                        <div className='flex w-96 justify-center'>내용</div>
+                    <div className='flex flex-row border-t-[3px] border-b-[3px] py-3'>
+                        <div className='flex ml-10 w-40 justify-start'>번호</div>
+                        <div className='flex w-52 justify-start'>제목</div>
+                        <div className='flex w-80 justify-start'>내용</div>
+                        <div className='flex w-32 justify-start'>시간</div>
                     </div>
-                    <BoardList />
+                    <div className='pt-3'>
+                        <BoardList />
+                    </div>
                 </div>
             </div>
         </div>

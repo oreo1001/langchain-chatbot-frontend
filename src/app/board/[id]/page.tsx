@@ -1,10 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { Board } from '../../types';
-import { getBoardList } from '@/redux/slices/boardSlice';
+import { Board, myComment } from '../../types';
+import { getBoardList, getLoading } from '@/redux/slices/boardSlice';
 import { useAppSelector } from '@/redux/hooks';
 import { useParams, useRouter } from 'next/navigation';
 import { AIResponse } from './AIResponse';
+import { getCommentList } from '@/redux/slices/commentSlice';
 
 export default function BoardPage() {
     const params = useParams();
@@ -13,8 +14,10 @@ export default function BoardPage() {
     const router = useRouter()
     const boardList = useAppSelector(getBoardList);
 
+    const commentList = useAppSelector(getCommentList)
+    const [comment, setComment] = useState<myComment | null>(null);
+
     useEffect(() => {
-        //persist 스토리지로 구현
         const fetchBoard = async () => {
             const foundBoard = boardList.find((b) => b.id === Number(id));
             setBoard(foundBoard || null);
@@ -24,10 +27,17 @@ export default function BoardPage() {
         }
     }, [id, boardList]);
 
+    useEffect(() => {
+        const fetchComment = async () => {
+            const foundComment = commentList.find((c) => c.id === Number(id));
+            setComment(foundComment || null);
+        };
+        fetchComment();
+    }, [id, commentList]);
+
     if (!board) {
         return <div className='flex items-center justify-center w-screen h-screen bg-white'>게시글을 찾을 수 없습니다.</div>;
     }
-
     return (
         <>
             <div className='flex justify-center bg-white w-screen h-screen'>
@@ -49,7 +59,12 @@ export default function BoardPage() {
                     <div className='flex w-full justify-start'>
                         <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={() => router.push('/board')}>목록</button>
                     </div>
-                    <AIResponse content={board.content} title={board.title} />
+                    {comment && (
+                        <div>
+                            <h2>Found Response:</h2>
+                            <p>{comment.response}</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

@@ -44,10 +44,10 @@ export default function BoardForm() {
             });
             const responseJson = await response.json();
             dispatch(addComment({ "boardId": generatedId, "comment": responseJson.aiResponse }))
-            dispatch(setLoading(false))
-
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            dispatch(setLoading(false))
         }
     };
 

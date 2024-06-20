@@ -1,7 +1,7 @@
 'use client'
-import { Board } from '@/app/types'
+import { Board, myComment } from '@/app/types'
 import { RootState } from '../store'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
@@ -26,6 +26,13 @@ export const boardSlice = createSlice({
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.loading == action.payload
         },
+        addComment: (state, action: PayloadAction<{ boardId: number; comment: myComment }>) => {
+            const { boardId, comment } = action.payload;
+            const board = state.boardList.find(board => board.id === boardId);
+            if (board) {
+                board.commentList.push(comment);
+            }
+        },
     },
 })
 
@@ -33,12 +40,20 @@ export const {
     reset,
     uploadBoard,
     setLoading,
+    addComment,
 } = boardSlice.actions
 const persistConfig = {
     key: 'board',
     storage,
 }
-export const getBoard = (state: RootState) => state.board
+export const makeGetBoardById = () =>      //메모이제이션으로 selector만들기
+    createSelector(
+        [getBoardList, (state: RootState, id: number) => id],
+        (boardList, id) => boardList.find(board => board.id === id)
+    );
+// export const getBoard = (state: RootState, id: number) => {
+//     return state.board.boardList.find(board => board.id === id);
+// };
 export const getBoardList = (state: RootState) => state.board.boardList
 export const countBoardList = (state: RootState) => state.board.boardList.length
 export const getLoading = (state: RootState) => state.board.loading

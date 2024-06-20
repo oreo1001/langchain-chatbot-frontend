@@ -4,10 +4,10 @@ export interface Board {
     title: string;
     content: string;
     dateTime: string;
+    commentList: myComment[]
 }
 
 export interface myComment {
-    id: number;
-    question: string;
-    response: string;
+    commentId: number;
+    content: string;
 }

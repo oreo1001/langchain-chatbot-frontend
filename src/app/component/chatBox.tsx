@@ -74,14 +74,31 @@ export function HumanBox({ content }: HumanBoxProps) {
         </div>
     );
 }
-export function ChatBox({ content }: HumanBoxProps) {
-    const messageStyle = 'bg-[#F4F4F4] tracking-normal leading-7 whitespace-pre-wrap';
+
+export function CommentAIBox({ content, loading }: AIBoxProps) {
+    const messageStyle = 'bg-white tracking-normal leading-5 whitespace-pre-wrap text-sm';
     const alignment = 'justify-start';
 
     return (
-        <div className={`flex ${alignment} p-2`}>
-            <div className={`rounded-lg p-3 ${messageStyle}`}>
-                {content}
+        <div className={`flex ${alignment} flex-col px-2 py-3`}>
+            <div className={`flex ${alignment} py-2`}>
+                <div className="w-10 h-10 rounded-xl ml-3 mr-2">
+                    <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
+                </div>
+                <span className={`pl-2 w-[550px] rounded-lg ${messageStyle}`}>
+                    {loading ? (
+                        <div className="flex items-center justify-center">
+                            <Lottie
+                                loop
+                                animationData={loadingJson2}
+                                play
+                                style={{ width: 300, height: 100 }}
+                            ></Lottie>
+                        </div>
+                    ) : (
+                        renderContentWithImages(content)
+                    )}
+                </span>
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 'use client'
 import { Board, myComment } from '@/app/types'
 import { RootState } from '../store'
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
@@ -35,6 +35,15 @@ export const boardSlice = createSlice({
         },
     },
 })
+
+export const fetchBoardData = createAsyncThunk(
+    'board/fetchBoardData',
+    async (id: string) => {
+        const response = await fetch(`/api/board/${id}`);
+        const data = await response.json();
+        return { id, data };
+    }
+);
 
 export const {
     reset,

@@ -1,28 +1,55 @@
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { myComment } from '../../types';
-import { getLoading, makeGetBoardById } from '@/redux/slices/boardSlice';
+import { addComment, getTempQuestion, makeGetBoardById } from '@/redux/slices/boardSlice';
 import { useParams, useRouter } from 'next/navigation';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { CommentAIBox } from '@/app/component/chatBox';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch } from '@/redux/hooks';
 
 export default function BoardPage() {
     const params = useParams();
     const id = params.id;
+    const myBoardId = (typeof id === 'string') ? id : id[0];
     const router = useRouter()
     const getBoardById = makeGetBoardById();
     const thisBoard = useSelector((state: RootState) => getBoardById(state, Number(id)));
-    const commentLoading = useAppSelector(getLoading)
+    const [commentLoading, setCommentLoading] = useState<boolean>(true);
+
     const [commentList, setCommentList] = useState<myComment[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputValue = useSelector(getTempQuestion)
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         if (thisBoard) {
             setCommentList(thisBoard.commentList);
+            if (thisBoard.commentList.length > 0) {
+                setCommentLoading(false)
+            } else {
+                ifCommentEmptyGetAPI();
+            }
         }
-    }, [thisBoard]);
+    }, [thisBoard, commentList]);
+
+    const ifCommentEmptyGetAPI = async () => {
+        try {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/board/comment', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify({ id: myBoardId, question: inputValue, }),
+            });
+            const responseJson = await response.json();
+            dispatch(addComment({ "boardId": parseInt(myBoardId), "comment": responseJson.aiResponse }))
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setCommentLoading(false)
+        }
+    }
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -35,6 +62,8 @@ export default function BoardPage() {
     if (!thisBoard) {
         return <div className='flex items-center justify-center w-screen h-screen bg-white'>게시글을 찾을 수 없습니다.</div>;
     }
+
+    console.log(commentLoading)
     return (
         <div className='flex justify-center bg-white w-screen h-full min-h-screen'>
             <div className='w-[600px] flex flex-col items-center'>
@@ -61,7 +90,7 @@ export default function BoardPage() {
                         </div>
                     ) : (
                         <div key={comment.commentId} className='px-8'>
-                            {comment.content}
+                            {/* {comment.content} */}
                         </div>
                     )
                 ))}

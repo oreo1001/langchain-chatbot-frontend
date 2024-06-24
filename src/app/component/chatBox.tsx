@@ -75,7 +75,7 @@ export function HumanBox({ content }: HumanBoxProps) {
     );
 }
 
-export function CommentAIBox({ content, loading }: AIBoxProps) {
+export function CommentAIBox({ loading, content }: AIBoxProps) {
     const messageStyle = 'bg-white tracking-normal leading-5 whitespace-pre-wrap text-sm';
     const alignment = 'justify-start';
 
@@ -92,7 +92,7 @@ export function CommentAIBox({ content, loading }: AIBoxProps) {
                                 loop
                                 animationData={loadingJson2}
                                 play
-                                style={{ width: 300, height: 100 }}
+                                style={{ width: 400, height: 100 }}
                             ></Lottie>
                         </div>
                     ) : (

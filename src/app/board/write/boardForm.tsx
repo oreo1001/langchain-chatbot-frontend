@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
-import { addComment, setLoading, uploadBoard } from '@/redux/slices/boardSlice';
+import { addComment, setLoading, setTempQuestion, uploadBoard } from '@/redux/slices/boardSlice';
 import { useRouter } from 'next/navigation';
 
 export default function BoardForm() {
@@ -27,28 +27,14 @@ export default function BoardForm() {
         }
     };
     const handleWrite = async (event: any) => {
+        dispatch(setLoading(true))
         event.preventDefault();
 
         const generatedId = Math.floor(Math.random() * 1000000);
-        dispatch(setLoading(true))
         dispatch(uploadBoard({ id: generatedId, title: title, content: content, dateTime: Date.now().toString(), commentList: [] }));
         router.push(`/board/${generatedId}`);
         var inputValue = title + " " + content
-        try {
-            const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/board/comment', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify({ id: generatedId, question: inputValue, }),
-            });
-            const responseJson = await response.json();
-            dispatch(addComment({ "boardId": generatedId, "comment": responseJson.aiResponse }))
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            dispatch(setLoading(false))
-        }
+        dispatch(setTempQuestion(inputValue))
     };
 
     const autoResizeTextarea = (textarea: any) => {

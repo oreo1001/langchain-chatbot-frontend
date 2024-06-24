@@ -8,11 +8,13 @@ import storage from 'redux-persist/lib/storage'
 type BoardState = {
     boardList: Board[]
     loading: boolean
+    tempQuestion: string
 }
 
 const initialState: BoardState = {
     boardList: [],
     loading: false,
+    tempQuestion: '',
 }
 
 export const boardSlice = createSlice({
@@ -33,6 +35,9 @@ export const boardSlice = createSlice({
                 board.commentList.push(comment);
             }
         },
+        setTempQuestion: (state, action: PayloadAction<string>) => {
+            state.tempQuestion = action.payload
+        }
     },
 })
 
@@ -50,6 +55,7 @@ export const {
     uploadBoard,
     setLoading,
     addComment,
+    setTempQuestion,
 } = boardSlice.actions
 const persistConfig = {
     key: 'board',
@@ -66,6 +72,7 @@ export const makeGetBoardById = () =>      //메모이제이션으로 selector�
 export const getBoardList = (state: RootState) => state.board.boardList
 export const countBoardList = (state: RootState) => state.board.boardList.length
 export const getLoading = (state: RootState) => state.board.loading
+export const getTempQuestion = (state: RootState) => state.board.tempQuestion
 const persistedBoardReducer = persistReducer(persistConfig, boardSlice.reducer)
 
 export default persistedBoardReducer

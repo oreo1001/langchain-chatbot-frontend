@@ -85,19 +85,25 @@ export function CommentAIBox({ loading, content }: AIBoxProps) {
                 <div className="w-10 h-10 rounded-xl ml-3 mr-2">
                     <img src="/assets/sapie.png" alt="AI" className="w-full h-full rounded-xl" />
                 </div>
-                <span className={`pl-2 w-[550px] rounded-lg ${messageStyle}`}>
-                    {loading ? (
-                        <div className="flex items-center justify-center">
-                            <Lottie
-                                loop
-                                animationData={loadingJson2}
-                                play
-                                style={{ width: 400, height: 100 }}
-                            ></Lottie>
-                        </div>
-                    ) : (
-                        renderContentWithImages(content)
-                    )}
+                <span className={`flex items-center pl-2 w-[550px] rounded-lg ${messageStyle}`}>
+                    {renderContentWithImages(content)}
+                </span>
+            </div>
+        </div>
+    );
+}
+export function CommentBox({ content }: AIBoxProps) {
+    const messageStyle = 'bg-white tracking-normal leading-5 whitespace-pre-wrap text-sm';
+    const alignment = 'justify-end';
+
+    return (
+        <div className={`flex ${alignment} flex-col px-2 py-3`}>
+            <div className={`flex ${alignment} py-2`}>
+                <div className="w-10 h-10 rounded-xl ml-3 mr-2">
+                    <img src="/assets/user-profile.jpg" alt="user" className="w-full h-full rounded-xl" />
+                </div>
+                <span className={`flex items-center pl-2 w-[550px] rounded-lg ${messageStyle}`}>
+                    {content}
                 </span>
             </div>
         </div>

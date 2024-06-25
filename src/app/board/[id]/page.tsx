@@ -5,8 +5,11 @@ import { addComment, getTempQuestion, makeGetBoardById } from '@/redux/slices/bo
 import { useParams, useRouter } from 'next/navigation';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
-import { CommentAIBox } from '@/app/component/chatBox';
+import { CommentAIBox, CommentBox } from '@/app/component/chatBox';
 import { useAppDispatch } from '@/redux/hooks';
+import Lottie from 'react-lottie-player';
+import loadingJson2 from '../../../../public/assets/loading2.json'
+import { generateRandomId } from '@/app/utils/generateRandomId';
 
 export default function BoardPage() {
     const params = useParams();
@@ -21,6 +24,8 @@ export default function BoardPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputValue = useSelector(getTempQuestion)
     const dispatch = useAppDispatch()
+    const [aiCommentPosted, setAiCommentPosted] = useState(false);
+    const [comment, setComment] = useState('');
 
     useEffect(() => {
         if (thisBoard) {
@@ -28,12 +33,19 @@ export default function BoardPage() {
             if (thisBoard.commentList.length > 0) {
                 setCommentLoading(false)
             } else {
-                ifCommentEmptyGetAPI();
+                ifCommentEmptyGetAIComment();
             }
         }
-    }, [thisBoard, commentList]);
+    }, [thisBoard, commentLoading]);
 
-    const ifCommentEmptyGetAPI = async () => {
+    useEffect(() => {
+        if (commentList.length > 0) {
+            setAiCommentPosted(true);
+        }
+        scrollToBottom();
+    }, [commentList]);
+
+    const ifCommentEmptyGetAIComment = async () => {
         try {
             const response = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/board/comment', {
                 method: 'POST',
@@ -55,15 +67,31 @@ export default function BoardPage() {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
-    useEffect(() => {
-        scrollToBottom();
-    }, [commentList]);
+    const addUserComment = () => {
+        dispatch(addComment({ "boardId": parseInt(myBoardId), "comment": { "commentId": generateRandomId(), "content": comment } }))
+        setComment('')
+    }
+    const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setComment(event.target.value);
+        autoResizeTextarea(event.target);
+    };
+    const handleKeyPress = (event: any) => {
+        if (event.key === 'Enter' && event.shiftKey) {  // Shift + Enter: 줄바꿈만 적용
+            return;
+        } else if (event.key === 'Enter') {
+            event.preventDefault(); // 줄바꿈 방지
+            addUserComment();
+        }
+    };
+
+    const autoResizeTextarea = (textarea: any) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    };
 
     if (!thisBoard) {
         return <div className='flex items-center justify-center w-screen h-screen bg-white'>게시글을 찾을 수 없습니다.</div>;
     }
-
-    console.log(commentLoading)
     return (
         <div className='flex justify-center bg-white w-screen h-full min-h-screen'>
             <div className='w-[600px] flex flex-col items-center'>
@@ -83,17 +111,42 @@ export default function BoardPage() {
                 <div className='flex w-full justify-start'>
                     <button className='px-3 py-2 border-2 rounded border-slate-200' onClick={() => router.push('/board')}>목록</button>
                 </div>
+                {commentList.length == 0 ?
+                    <div className="flex items-center justify-center">
+                        <Lottie
+                            loop
+                            animationData={loadingJson2}
+                            play
+                            style={{ width: 400, height: 100 }}
+                        ></Lottie>
+                    </div>
+                    :
+                    <div key={commentList[0].commentId} className='mx-8'>
+                        <CommentAIBox loading={commentLoading} content={commentList[0].content}></CommentAIBox>
+                    </div>
+                }
                 {commentList.map((comment, index) => (
-                    index === 0 ? (
-                        <div key={comment.commentId} className='mx-8'>
-                            <CommentAIBox loading={commentLoading} content={comment.content}></CommentAIBox>
-                        </div>
-                    ) : (
-                        <div key={comment.commentId} className='px-8'>
-                            {/* {comment.content} */}
+                    index > 0 && (
+                        <div key={comment.commentId} className='flex justify-end items-center px-8'>
+                            <CommentBox loading={commentLoading} content={comment.content}></CommentBox>
                         </div>
                     )
                 ))}
+                {aiCommentPosted && (
+                    <div className="w-full flex flex-col">
+                        <textarea
+                            className="text-sm min-h-[30px] w-full border-2 border-slate-200 rounded px-2 py-1 resize-none outline-none overflow-hidden"
+                            id="comment"
+                            name="comment"
+                            value={comment}
+                            onChange={handleContentChange}
+                            onKeyDown={handleKeyPress}
+                            placeholder="댓글을 입력하세요..."
+                        ></textarea>
+                        <button className='flex justify-end mt-2'>
+                            <div className='w-[100px] px-3 py-2 border-2 rounded border-slate-200' onClick={addUserComment}>댓글 달기</div></button>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
         </div>

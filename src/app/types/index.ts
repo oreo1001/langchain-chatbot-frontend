@@ -8,6 +8,6 @@ export interface Board {
 }
 
 export interface myComment {
-    commentId: number;
+    commentId: string;
     content: string;
 }

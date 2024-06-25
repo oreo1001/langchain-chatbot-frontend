@@ -41,15 +41,6 @@ export const boardSlice = createSlice({
     },
 })
 
-export const fetchBoardData = createAsyncThunk(
-    'board/fetchBoardData',
-    async (id: string) => {
-        const response = await fetch(`/api/board/${id}`);
-        const data = await response.json();
-        return { id, data };
-    }
-);
-
 export const {
     reset,
     uploadBoard,

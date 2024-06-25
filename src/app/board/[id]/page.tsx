@@ -16,16 +16,16 @@ export default function BoardPage() {
     const id = params.id;
     const myBoardId = (typeof id === 'string') ? id : id[0];
     const router = useRouter()
-    const getBoardById = makeGetBoardById();
-    const thisBoard = useSelector((state: RootState) => getBoardById(state, Number(id)));
+    const getBoardById = makeGetBoardById();                         //boardSlice 함수 
+    const thisBoard = useSelector((state: RootState) => getBoardById(state, Number(id)));   //현재 board 찾기
     const [commentLoading, setCommentLoading] = useState<boolean>(true);
 
     const [commentList, setCommentList] = useState<myComment[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const inputValue = useSelector(getTempQuestion)
+    const inputValue = useSelector(getTempQuestion)                    //ai한테 보내는 질문
     const dispatch = useAppDispatch()
-    const [aiCommentPosted, setAiCommentPosted] = useState(false);
-    const [comment, setComment] = useState('');
+    const [aiCommentPosted, setAiCommentPosted] = useState(false);    //ai의 첫댓글 
+    const [comment, setComment] = useState('');                      //댓글 입력을 위한
 
     useEffect(() => {
         if (thisBoard) {
